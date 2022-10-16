@@ -1,10 +1,7 @@
 .profile-thumbnail {
-    /*position: absolute;*/
 }
 
 .profile-header {
-    /*min-height: 260px;*/
-    /*margin-left: 140px;*/
 }
 
 div.post-tabs {
@@ -60,7 +57,7 @@ ul.comments {
 }
 
 ul.comments li.comment {
-    margin-left: 32px;
+    /*margin-left: 32px;*/
     padding: 8px;
     border-bottom: 1px solid #e0e0e0;
 }
@@ -91,7 +88,7 @@ div.comment-content {
 }
 
 div.comment-form {
-    margin: 16px 0px 16px 32px;
+    margin: 16px 0px 16px 0px;
 }
 
 div.pagination {
