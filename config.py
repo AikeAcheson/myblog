@@ -17,6 +17,8 @@ class Config:
     MYBLOG_POSTS_PER_PAGE = 20
     MYBLOG_FOLLOWERS_PER_PAGE = 50
     MYBLOG_COMMENTS_PER_PAGE = 30
+    MYBLOG_NOTEBOOKS_PER_PAGE = 10
+    MYBLOG_NOTEBOOK_DIR = os.path.join(basedir, 'app/static/notebook')
 
     @staticmethod
     def init_app(app): pass

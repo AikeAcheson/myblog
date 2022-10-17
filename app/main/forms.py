@@ -1,5 +1,5 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField
+from flask_wtf import FlaskForm, Form
+from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectField, FileField
 from wtforms.validators import Length, DataRequired, Email, Regexp, ValidationError
 from ..models import Role, User
 from flask_pagedown.fields import PageDownField
@@ -48,3 +48,11 @@ class PostForm(FlaskForm):
 class CommentForm(FlaskForm):
     body = StringField('', validators=[DataRequired()])
     submit = SubmitField('Submit')
+
+
+class NotebookForm(FlaskForm):
+    image = FileField('Image')
+    file = FileField('File', validators=[DataRequired()])
+    file_show_name = StringField('File show name', validators=[DataRequired()])
+    introduction = TextAreaField('Introduction')
+    submit = SubmitField('Upload')

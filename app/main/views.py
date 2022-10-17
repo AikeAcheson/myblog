@@ -1,10 +1,12 @@
 from flask import render_template, redirect, flash, url_for, abort, request, current_app, make_response
 from . import main
-from ..models import User, Role, Permission, Post, Comment
-from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm
+from ..models import User, Role, Permission, Post, PostComment, Notebook, NotebookComment
+from .forms import EditProfileForm, EditProfileAdminForm, PostForm, CommentForm, NotebookForm
 from flask_login import login_required, current_user
 from .. import db
 from ..decorator import admin_required, permission_required
+from werkzeug.utils import secure_filename
+import os
 
 
 @main.route('/', methods=['GET', 'POST'])
@@ -93,7 +95,7 @@ def post(id):
     post = Post.query.get_or_404(id)
     form = CommentForm()
     if form.validate_on_submit():
-        comment = Comment(body=form.body.data,
+        comment = PostComment(body=form.body.data,
                           post=post,
                           author=current_user._get_current_object())
         db.session.add(comment)
@@ -103,7 +105,7 @@ def post(id):
     page = request.args.get('page', 1, type=int)
     if page == -1:
         page = (post.comments.count() - 1) // current_app.config['MYBLOG_COMMENTS_PER_PAGE'] + 1
-    pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
+    pagination = post.comments.order_by(PostComment.timestamp.asc()).paginate(
         page=page,
         per_page=current_app.config['MYBLOG_COMMENTS_PER_PAGE'],
         error_out=False
@@ -219,7 +221,7 @@ def show_followed():
 @permission_required(Permission.MODERATE)
 def moderate():
     page = request.args.get('page', 1, type=int)
-    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
+    pagination = PostComment.query.order_by(PostComment.timestamp.desc()).paginate(
         page=page,
         per_page=current_app.config['MYBLOG_COMMENTS_PER_PAGE'],
         error_out=False
@@ -232,7 +234,7 @@ def moderate():
 @login_required
 @permission_required(Permission.MODERATE)
 def moderate_enable(id):
-    comment = Comment.query.get_or_404(id)
+    comment = PostComment.query.get_or_404(id)
     comment.disabled = False
     db.session.add(comment)
     db.session.commit()
@@ -244,9 +246,33 @@ def moderate_enable(id):
 @login_required
 @permission_required(Permission.MODERATE)
 def moderate_disable(id):
-    comment = Comment.query.get_or_404(id)
+    comment = PostComment.query.get_or_404(id)
     comment.disabled = True
     db.session.add(comment)
     db.session.commit()
     page = request.args.get('page', 1, type=int)
     return redirect(url_for('.moderate', page=page))
+
+
+@main.route('/notebooks/', methods=['GET', 'POST'])
+def notebooks():
+    form = NotebookForm()
+    if current_user.can(Permission.ADMIN) and form.validate_on_submit():
+        author = current_user._get_current_object()
+        filename = secure_filename(form.file.data.filename)
+        imagename = secure_filename(form.image.data.filename)
+        introduction = form.introduction.data
+        file_show_name = form.file_show_name.data
+        form.file.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename))
+        form.image.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename))
+        notebook = Notebook(file=filename, image=imagename, introduction=introduction, author=author,
+                            file_show_name=file_show_name)
+        db.session.add(notebook)
+        db.session.commit()
+        return redirect(url_for('.notebooks'))
+    page = request.args.get('page', 1, type=int)
+    pagination = Notebook.query.order_by(Notebook.file.asc()).paginate(
+        page=page, per_page=current_app.config['MYBLOG_NOTEBOOKS_PER_PAGE'], error_out=False
+    )
+    items = pagination.items
+    return render_template('notebooks.html', form=form, items=items, pagination=pagination)

@@ -1,6 +1,6 @@
 from flask import jsonify, request, g, url_for, current_app
 from .. import db
-from ..models import Post, Permission, Comment
+from ..models import Post, Permission, PostComment
 from . import api
 from .decorators import permission_required
 
@@ -8,7 +8,7 @@ from .decorators import permission_required
 @api.route('/comments/')
 def get_comments():
     page = request.args.get('page', 1, type=int)
-    pagination = Comment.query.order_by(Comment.timestamp.desc()).paginate(
+    pagination = PostComment.query.order_by(PostComment.timestamp.desc()).paginate(
         page, per_page=current_app.config['MYBLOG_COMMENTS_PER_PAGE'],
         error_out=False)
     comments = pagination.items
@@ -28,7 +28,7 @@ def get_comments():
 
 @api.route('/comments/<int:id>')
 def get_comment(id):
-    comment = Comment.query.get_or_404(id)
+    comment = PostComment.query.get_or_404(id)
     return jsonify(comment.to_json())
 
 
@@ -36,7 +36,7 @@ def get_comment(id):
 def get_post_comments(id):
     post = Post.query.get_or_404(id)
     page = request.args.get('page', 1, type=int)
-    pagination = post.comments.order_by(Comment.timestamp.asc()).paginate(
+    pagination = post.comments.order_by(PostComment.timestamp.asc()).paginate(
         page, per_page=current_app.config['MYBLOG_COMMENTS_PER_PAGE'],
         error_out=False)
     comments = pagination.items
@@ -58,7 +58,7 @@ def get_post_comments(id):
 @permission_required(Permission.COMMENT)
 def new_post_comment(id):
     post = Post.query.get_or_404(id)
-    comment = Comment.from_json(request.json)
+    comment = PostComment.from_json(request.json)
     comment.author = g.current_user
     comment.post = post
     db.session.add(comment)
