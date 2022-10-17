@@ -96,8 +96,8 @@ def post(id):
     form = CommentForm()
     if form.validate_on_submit():
         comment = PostComment(body=form.body.data,
-                          post=post,
-                          author=current_user._get_current_object())
+                              post=post,
+                              author=current_user._get_current_object())
         db.session.add(comment)
         db.session.commit()
         flash('Your comment has been published.')
@@ -276,3 +276,14 @@ def notebooks():
     )
     items = pagination.items
     return render_template('notebooks.html', form=form, items=items, pagination=pagination)
+
+
+@main.route('/edit-notebook/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_notebook(id):
+    pass
+
+
+@main.route('/notebook/<int:id>', methods=['GET', 'POST'])
+def notebook(id):
+    pass
