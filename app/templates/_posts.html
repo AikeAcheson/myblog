@@ -23,7 +23,7 @@
                 <div class="post-footer">
                     {% if current_user == post.author %}
                         <a href="{{ url_for('.edit_post', id=post.id) }}">
-                            <span class="label label-primary">Edit</span>
+                            <span class="label label-warning">Edit</span>
                         </a>
                     {% elif current_user.is_administrator() %}
                         <a href="{{ url_for('.edit_post', id=post.id) }}">
@@ -31,7 +31,7 @@
                         </a>
                     {% endif %}
                     <a href="{{ url_for('.post', id=post.id) }}">
-                        <span class="label label-default">Permalink</span>
+                        <span class="label label-info">Permalink</span>
                     </a>
                     <a href="{{ url_for('.post', id=post.id) }}#comments">
                         <span class="label label-primary">{{ post.comments.count() }} Comments</span>
