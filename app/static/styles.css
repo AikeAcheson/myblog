@@ -189,3 +189,23 @@ div.notebook-content {
 div.notebook-footer {
     text-align: right;
 }
+
+
+/* footer*/
+.footer {
+    background: #fff;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+
+.sidebar-social {
+    margin: 1px;
+    height: 30px;
+    border: black 3px solid;
+    padding: 2px;
+    border-radius: 5px;
+}
