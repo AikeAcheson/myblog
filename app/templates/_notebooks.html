@@ -6,7 +6,7 @@
                     <td class="notebook-image">
                         {% if notebook.image %}
                             {% set imagename = 'notebook/' + notebook.image %}
-                            <a href="{{ url_for('static', filename=imagename) }}">
+                            <a href="{{ url_for('.notebook', id=notebook.id) }}">
                                 <img class="img-rounded" src="{{ url_for('static', filename=imagename) }}">
                             </a>
                         {% else %}
