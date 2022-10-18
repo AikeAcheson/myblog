@@ -73,4 +73,4 @@ def deploy():
     User.add_self_follow()
 
     # assign admin right to admin user
-    User.assign_role_to_admin()
+    User.assign_role()
