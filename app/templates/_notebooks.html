@@ -39,10 +39,16 @@
             </table>
             <div class="notebook-footer">
                 {% if current_user == notebook.author %}
+                    <a href="{{ url_for('.delete_notebook', id=notebook.id) }}">
+                        <span class="label label-danger">Delete</span>
+                    </a>
                     <a href="{{ url_for('.edit_notebook', id=notebook.id) }}">
                         <span class="label label-warning">Edit</span>
                     </a>
                 {% elif current_user.is_administrator() %}
+                    <a href="{{ url_for('.delete_notebook', id=notebook.id) }}">
+                        <span class="label label-danger">Delete</span>
+                    </a>
                     <a href="{{ url_for('.edit_notebook', id=notebook.id) }}">
                         <span class="label label-danger">Edit [Admin]</span>
                     </a>

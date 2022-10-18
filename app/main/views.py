@@ -6,6 +6,7 @@ from flask_login import login_required, current_user
 from .. import db
 from ..decorator import admin_required, permission_required
 from werkzeug.utils import secure_filename
+import time
 import os
 
 
@@ -262,9 +263,19 @@ def notebooks():
         imagename = None
         if form.image:
             imagename = secure_filename(form.image.data.filename)
-            form.image.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename))
+            full_imagename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename)
+            if os.path.exists(full_imagename):
+                imagename = f's{int(time.time())}_{imagename}'
+                full_imagename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename)
+            form.image.data.save(full_imagename)
+
         if form.file:
             filename = secure_filename(form.file.data.filename)
+            full_filename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename)
+            if os.path.exists(full_filename):
+                filename = f's{int(time.time())}_{filename}'
+                full_filename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename)
+            form.file.data.save(full_filename)
         else:
             flash('File cannot be empty.')
             return redirect(url_for('.notebooks'))
@@ -342,3 +353,22 @@ def notebook(id):
         error_out=False)
     comments = pagination.items
     return render_template('notebook.html', notebooks=[notebook], form=form, comments=comments, pagination=pagination)
+
+
+@main.route('/delete-notebook/<int:id>')
+@login_required
+def delete_notebook(id):
+    notebook = Notebook.query.get_or_404(id)
+    if current_user != notebook.author_id and not current_user.can(Permission.ADMIN):
+        abort(403)
+
+    # delete files on hardware
+    full_filename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], notebook.file)
+    if os.path.exists(full_filename):
+        os.remove(full_filename)
+    full_imagename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], notebook.image)
+    if os.path.exists(full_imagename):
+        os.remove(full_imagename)
+    db.session.delete(notebook)
+    db.session.commit()
+    return redirect(url_for('.notebooks'))
