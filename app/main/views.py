@@ -259,12 +259,22 @@ def notebooks():
     form = NotebookForm()
     if current_user.can(Permission.ADMIN) and form.validate_on_submit():
         author = current_user._get_current_object()
-        filename = secure_filename(form.file.data.filename)
-        imagename = secure_filename(form.image.data.filename)
-        introduction = form.introduction.data
-        file_show_name = form.file_show_name.data
-        form.file.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename))
-        form.image.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename))
+        imagename = None
+        if form.image:
+            imagename = secure_filename(form.image.data.filename)
+            form.image.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename))
+        if form.file:
+            filename = secure_filename(form.file.data.filename)
+        else:
+            flash('File cannot be empty.')
+            return redirect(url_for('.notebooks'))
+        introduction = None
+        if form.introduction:
+            introduction = form.introduction.data
+        if form.file_show_name:
+            file_show_name = form.file_show_name.data
+        else:
+            file_show_name = filename
         notebook = Notebook(file=filename, image=imagename, introduction=introduction, author=author,
                             file_show_name=file_show_name)
         db.session.add(notebook)
@@ -274,16 +284,61 @@ def notebooks():
     pagination = Notebook.query.order_by(Notebook.file.asc()).paginate(
         page=page, per_page=current_app.config['MYBLOG_NOTEBOOKS_PER_PAGE'], error_out=False
     )
-    items = pagination.items
-    return render_template('notebooks.html', form=form, items=items, pagination=pagination)
+    notebooks = pagination.items
+    return render_template('notebooks.html', form=form, notebooks=notebooks, pagination=pagination)
 
 
 @main.route('/edit-notebook/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_notebook(id):
-    pass
+    notebook = Notebook.query.get_or_404(id)
+    if current_user != notebook.author_id and not current_user.can(Permission.ADMIN):
+        abort(403)
+    form = NotebookForm()
+    if form.validate_on_submit():
+        if form.image:
+            imagename = secure_filename(form.image.data.filename)
+            if imagename != notebook.image:
+                form.image.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename))
+                notebook.image = imagename
+        if form.file:
+            filename = secure_filename(form.file.data.filename)
+            if filename != notebook.file:
+                form.file.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename))
+                notebook.file = filename
+        if form.introduction:
+            notebook.introduction = form.introduction.data
+        if form.file_show_name:
+            notebook.file_show_name = form.file_show_name.data
+        db.session.add(notebook)
+        db.session.commit()
+        flash('The notebook has been updated.')
+        return redirect(url_for('.notebook', id=notebook.id))
+    form.image.data = notebook.image
+    form.file.data = notebook.file
+    form.file_show_name.data = notebook.file_show_name
+    form.introduction.data = notebook.introduction
+    return render_template('edit_notebook.html', form=form)
 
 
 @main.route('/notebook/<int:id>', methods=['GET', 'POST'])
 def notebook(id):
-    pass
+    notebook = Notebook.query.get_or_404(id)
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = NotebookComment(body=form.body.data,
+                                  notebook=notebook,
+                                  author=current_user._get_current_object())
+        db.session.add(comment)
+        db.session.commit()
+        flash('Your comment has been published.')
+        return redirect(url_for('.notebook', id=notebook.id, page=-1))
+    page = request.args.get('page', 1, type=int)
+    if page == -1:
+        page = (notebook.comments.count() - 1) // current_app.config['MYBLOG_COMMENTS_PER_PAGE'] + 1
+    pagination = notebook.comments.order_by(NotebookComment.timestamp.asc()).paginate(
+        page=page,
+        per_page=current_app.config['MYBLOG_COMMENTS_PER_PAGE'],
+        error_out=False)
+    comments = pagination.items
+    return render_template('notebook.html', notebooks=[notebook], form=form, comments=comments, pagination=pagination)

@@ -136,7 +136,6 @@ div.flask-pagedown-preview h3 {
 .notebook-image {
     width: 20%;
     padding-right: 2%;
-    padding-top: 1%;
 }
 
 .notebook-image img {
@@ -146,4 +145,47 @@ div.flask-pagedown-preview h3 {
 
 .notebook-body {
     width: 80%;
+}
+
+ul.notebooks {
+    list-style-type: none;
+    padding: 0px;
+    margin: 16px 0px 0px 0px;
+    border-top: 1px solid #e0e0e0;
+}
+
+ul.posts {
+    margin: 0px;
+    border-top: none;
+}
+
+ul.notebooks li.notebook {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+ul.notebooks li.notebook:hover {
+    background-color: #f0f0f0;
+}
+
+div.notebook-author-and-date {
+    float: right;
+}
+
+div.notebook-author {
+    font-weight: bold;
+}
+
+div.notebook-date {
+
+}
+
+
+div.notebook-content {
+    margin-left: 48px;
+    min-height: 48px;
+}
+
+div.notebook-footer {
+    text-align: right;
 }

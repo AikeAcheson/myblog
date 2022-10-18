@@ -52,7 +52,7 @@ class CommentForm(FlaskForm):
 
 class NotebookForm(FlaskForm):
     image = FileField('Image')
-    file = FileField('File', validators=[DataRequired()])
-    file_show_name = StringField('File show name', validators=[DataRequired()])
+    file = FileField('File')
+    file_show_name = StringField('File show name')
     introduction = TextAreaField('Introduction')
-    submit = SubmitField('Upload')
+    submit = SubmitField('Submit')

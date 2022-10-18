@@ -1,42 +1,57 @@
 <ul class="notebooks">
-    {% for item in items %}
+    {% for notebook in notebooks %}
         <li class="notebook">
-            <div class="notebook-header">
-                {% set filename = 'notebook/' + item.file %}
-                <a href="{{ url_for('static', filename=filename) }}">
-                    <h4>{{ item.file_show_name }}</h4>
-                </a>
-            </div>
-            <div class="notebook-content">
-                <table>
-                    <tr>
-                        <td class="notebook-image">
-                            {% set imagename = 'notebook/' + item.image %}
+            <table>
+                <tr>
+                    <td class="notebook-image">
+                        {% if notebook.image %}
+                            {% set imagename = 'notebook/' + notebook.image %}
                             <a href="{{ url_for('static', filename=imagename) }}">
                                 <img class="img-rounded" src="{{ url_for('static', filename=imagename) }}">
                             </a>
-                        </td>
-                        <td class="notebook-body">
-                            {{ item.introduction }}
-                        </td>
-                    </tr>
-                </table>
-            </div>
+                        {% else %}
+                            <img class="img-rounded"
+                                 src="{{ url_for('static',filename='notebook/default.png') }}">
+                        {% endif %}
+                    </td>
+                    <td class="notebook-content">
+                        <div class="notebook-header">
+                            {% set filename = 'notebook/' + notebook.file %}
+                            <a href="{{ url_for('static', filename=filename) }}">
+                                <h4>{{ notebook.file_show_name }}</h4>
+                            </a>
+                        </div>
+                        <div class="notebook-body">
+                            {{ notebook.introduction }}
+                        </div>
+                        <div class="notebook-author-and-date">
+                            <div class="notebook-author">
+                                <a href="{{ url_for('.user', username=notebook.author.username) }}">
+                                    {{ notebook.author.username }}
+                                </a>
+                            </div>
+                            <div class="notebook-date">
+                                {{ moment(notebook.timestamp).fromNow() }}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
             <div class="notebook-footer">
-                {% if current_user == item.author %}
-                    <a href="{{ url_for('.edit_notebook', id=item.id) }}">
+                {% if current_user == notebook.author %}
+                    <a href="{{ url_for('.edit_notebook', id=notebook.id) }}">
                         <span class="label label-primary">Edit</span>
                     </a>
                 {% elif current_user.is_administrator() %}
-                    <a href="{{ url_for('.edit_notebook', id=item.id) }}">
+                    <a href="{{ url_for('.edit_notebook', id=notebook.id) }}">
                         <span class="label label-danger">Edit [Admin]</span>
                     </a>
                 {% endif %}
-                <a href="{{ url_for('.notebook', id=item.id) }}">
+                <a href="{{ url_for('.notebook', id=notebook.id) }}">
                     <span class="label label-default">Permalink</span>
                 </a>
-                <a href="{{ url_for('.notebook', id=item.id) }}#comments">
-                    <span class="label label-primary">{{ item.comments.count() }} Comments</span>
+                <a href="{{ url_for('.notebook', id=notebook.id) }}#comments">
+                    <span class="label label-primary">{{ notebook.comments.count() }} Comments</span>
                 </a>
             </div>
         </li>
