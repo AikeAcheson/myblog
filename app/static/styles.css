@@ -136,6 +136,7 @@ div.flask-pagedown-preview h3 {
 .notebook-image {
     width: 20%;
     padding-right: 2%;
+    padding-top: 1.5%;
 }
 
 .notebook-image img {
