@@ -261,7 +261,7 @@ def notebooks():
     if current_user.can(Permission.ADMIN) and form.validate_on_submit():
         author = current_user._get_current_object()
         imagename = None
-        if form.image:
+        if form.image.data:
             imagename = secure_filename(form.image.data.filename)
             full_imagename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename)
             if os.path.exists(full_imagename):
@@ -269,7 +269,7 @@ def notebooks():
                 full_imagename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename)
             form.image.data.save(full_imagename)
 
-        if form.file:
+        if form.file.data:
             filename = secure_filename(form.file.data.filename)
             full_filename = os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename)
             if os.path.exists(full_filename):
@@ -280,9 +280,9 @@ def notebooks():
             flash('File cannot be empty.')
             return redirect(url_for('.notebooks'))
         introduction = None
-        if form.introduction:
+        if form.introduction.data:
             introduction = form.introduction.data
-        if form.file_show_name:
+        if form.file_show_name.data:
             file_show_name = form.file_show_name.data
         else:
             file_show_name = filename
@@ -307,19 +307,17 @@ def edit_notebook(id):
         abort(403)
     form = NotebookForm()
     if form.validate_on_submit():
-        if form.image:
+        if form.image.data:
             imagename = secure_filename(form.image.data.filename)
-            if imagename != notebook.image:
-                form.image.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename))
-                notebook.image = imagename
-        if form.file:
+            form.image.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], imagename))
+            notebook.image = imagename
+        if form.file.data:
             filename = secure_filename(form.file.data.filename)
-            if filename != notebook.file:
-                form.file.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename))
-                notebook.file = filename
-        if form.introduction:
+            form.file.data.save(os.path.join(current_app.config['MYBLOG_NOTEBOOK_DIR'], filename))
+            notebook.file = filename
+        if form.introduction.data:
             notebook.introduction = form.introduction.data
-        if form.file_show_name:
+        if form.file_show_name.data:
             notebook.file_show_name = form.file_show_name.data
         db.session.add(notebook)
         db.session.commit()
