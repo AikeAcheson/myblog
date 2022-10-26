@@ -48,7 +48,7 @@ class PostForm(FlaskForm):
 
 
 class CommentForm(FlaskForm):
-    body = StringField('', validators=[DataRequired()])
+    body = CKEditorField("What's on you mind?", validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -56,5 +56,5 @@ class NotebookForm(FlaskForm):
     image = FileField('Image')
     file = FileField('File')
     file_show_name = StringField('File show name')
-    introduction = TextAreaField('Introduction')
+    introduction = CKEditorField("Introduction")
     submit = SubmitField('Submit')
