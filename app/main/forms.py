@@ -3,6 +3,7 @@ from wtforms import StringField, SubmitField, TextAreaField, BooleanField, Selec
 from wtforms.validators import Length, DataRequired, Email, Regexp, ValidationError
 from ..models import Role, User
 from flask_pagedown.fields import PageDownField
+from flask_ckeditor import CKEditorField
 
 
 class EditProfileForm(FlaskForm):
@@ -41,7 +42,8 @@ class EditProfileAdminForm(FlaskForm):
 
 
 class PostForm(FlaskForm):
-    body = PageDownField("What's on you mind?", validators=[DataRequired()])
+    # body = PageDownField("What's on you mind?", validators=[DataRequired()])
+    body = CKEditorField("What's on you mind?", validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 

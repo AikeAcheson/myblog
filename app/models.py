@@ -321,23 +321,23 @@ class Post(db.Model):
     body = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    body_html = db.Column(db.Text)
+    # body_html = db.Column(db.Text)
 
     comments = db.relationship('PostComment', backref='post', lazy='dynamic')
 
-    @staticmethod
-    def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
-                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul', 'h1', 'h2', 'h3', 'p']
-        target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
-            tags=allowed_tags, strip=True))
+    # @staticmethod
+    # def on_changed_body(target, value, oldvalue, initiator):
+    #     allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
+    #                     'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul', 'h1', 'h2', 'h3', 'p']
+    #     target.body_html = bleach.linkify(bleach.clean(
+    #         markdown(value, output_format='html'),
+    #         tags=allowed_tags, strip=True))
 
     def to_json(self):
         json_post = {
             'url': url_for('api.get_post', id=self.id),
             'body': self.body,
-            'body_html': self.body_html,
+            # 'body_html': self.body_html,
             'timestamp': self.timestamp,
             'author_url': url_for('api.get_user', id=self.author_id),
             'comments_url': url_for('api.get_post_comments', id=self.id),
@@ -353,32 +353,32 @@ class Post(db.Model):
         return Post(body=body)
 
 
-db.event.listen(Post.body, 'set', Post.on_changed_body)
+# db.event.listen(Post.body, 'set', Post.on_changed_body)
 
 
 class PostComment(db.Model):
     __tablename__ = 'post_comments'
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
-    body_html = db.Column(db.Text)
+    # body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     disabled = db.Column(db.Boolean)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
 
-    @staticmethod
-    def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i', 'strong']
-        target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
-            tags=allowed_tags, strip=True))
+    # @staticmethod
+    # def on_changed_body(target, value, oldvalue, initiator):
+    #     allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i', 'strong']
+    #     target.body_html = bleach.linkify(bleach.clean(
+    #         markdown(value, output_format='html'),
+    #         tags=allowed_tags, strip=True))
 
     def to_json(self):
         json_comment = {
             'url': url_for('api.get_comment', id=self.id),
             'post_url': url_for('api.get_post', id=self.post_id),
             'body': self.body,
-            'body_html': self.body_html,
+            # 'body_html': self.body_html,
             'timestamp': self.timestamp,
             'author_url': url_for('api.get_user', id=self.author_id),
         }
@@ -392,7 +392,7 @@ class PostComment(db.Model):
         return PostComment(body)
 
 
-db.event.listen(PostComment.body, 'set', PostComment.on_changed_body)
+# db.event.listen(PostComment.body, 'set', PostComment.on_changed_body)
 
 
 class Notebook(db.Model):
@@ -414,18 +414,18 @@ class NotebookComment(db.Model):
     __tablename__ = 'notebook_comments'
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.Text)
-    body_html = db.Column(db.Text)
+    # body_html = db.Column(db.Text)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     disabled = db.Column(db.Boolean)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     notebook_id = db.Column(db.Integer, db.ForeignKey('notebooks.id'))
 
-    @staticmethod
-    def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i', 'strong']
-        target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
-            tags=allowed_tags, strip=True))
+    # @staticmethod
+    # def on_changed_body(target, value, oldvalue, initiator):
+    #     allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i', 'strong']
+    #     target.body_html = bleach.linkify(bleach.clean(
+    #         markdown(value, output_format='html'),
+    #         tags=allowed_tags, strip=True))
 
 
-db.event.listen(NotebookComment.body, 'set', NotebookComment.on_changed_body)
+# db.event.listen(NotebookComment.body, 'set', NotebookComment.on_changed_body)
