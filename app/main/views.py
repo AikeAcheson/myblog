@@ -370,3 +370,8 @@ def delete_notebook(id):
     db.session.delete(notebook)
     db.session.commit()
     return redirect(url_for('.notebooks'))
+
+
+@main.route('/about')
+def about():
+    return render_template('about.html')
