@@ -1,0 +1,9 @@
+-r common.txt
+Faker==15.1.1
+httpie==3.2.1
+coverage==6.5.0
+idna==3.4
+Pygments==2.13.0
+requests==2.28.1
+urllib3==1.26.12
+
